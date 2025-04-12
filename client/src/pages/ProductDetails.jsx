@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAppContext } from "../context/appcontext";
+import { useAppContext } from "../context/AppContext";
 import { Link, useParams } from "react-router-dom";
 import ProductCategory from "./ProductCategory";
 import { assets } from "../assets/assets";

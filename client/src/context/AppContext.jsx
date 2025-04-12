@@ -36,7 +36,7 @@ export const AppContextProvider = ({children})=>{
 }
 
 //Update cart items Quantity
-const updateCartItems = (itemId,quantity) => {
+const updateCartItem = (itemId,quantity) => {
     let cartData = structuredClone(cartItems);
         cartData[itemId] = quantity;
         setCartItems(cartData);
@@ -45,7 +45,7 @@ const updateCartItems = (itemId,quantity) => {
     
 
 //remove item from cart
-const removeItemFromCart = (itemId) => {
+const removeFromCart = (itemId) => {
     let cartData = structuredClone(cartItems);
     if(cartData[itemId]){
         cartData[itemId] -= 1;
@@ -56,12 +56,35 @@ const removeItemFromCart = (itemId) => {
     toast.success("Item removed from cart")
     setCartItems(cartData);
 }
+
+// get cart item count
+const getCartCount = () => {
+    let totalCount = 0;
+    for(const item in cartItems){
+        totalCount += cartItems[item]
+    }
+    return totalCount;
+}
+
+// get cart total price
+const getCartAmount = () => {
+    let totalAmount = 0;
+    for(const item in cartItems){
+        let itemInfo = products.find((product)=>product._id === item);
+        if(cartItems[item] > 0){
+            totalAmount += itemInfo.offerPrice * cartItems[item]
+        }
+    }
+    return Math.floor (totalAmount * 100) / 100;
+}    
+
     useEffect(()=>{
-        fetchProducts()
+         fetchProducts()
     },[])
 
     const value = {navigate,user,setUser,setIsSeller,isSeller,
-        showUserlogin,setShowUserlogin , products,currency,addToCart,updateCartItems,removeItemFromCart,cartItems,searchQuery,setSearchQuery}
+        showUserlogin,setShowUserlogin , products,currency,addToCart,updateCartItem,removeFromCart,cartItems,searchQuery,setSearchQuery,
+        getCartCount,getCartAmount}
 
     return <AppContext.Provider value={value}>
         {children}
