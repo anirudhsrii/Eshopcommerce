@@ -76,7 +76,7 @@ const ProductDetails = () => {
                         <button onClick={()=>addToCart(product._id)} className="w-full py-3.5 cursor-pointer font-medium bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition" >
                             Add to Cart
                         </button>
-                        <button  onClick={()=>{addToCart(product._id),naviagte("/cart")}}  
+                        <button  onClick={()=>{addToCart(product._id),navigate("/cart")}}  
                         className="w-full py-3.5 cursor-pointer font-medium bg-primary text-white hover:bg-indigo-600 transition" >
                             Buy now
                         </button>
