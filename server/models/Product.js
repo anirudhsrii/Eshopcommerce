@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema({
     offerPrice: {type: Number, required: true},
     image: {type: Array, required: true},
     category: {type: String, required: true},
+    cartItems: {type: Object}, // {productId: quantity}
 
     inStock: {type: Boolean, default: true}, // {productId: quantity}
 }, {timestamps: true})

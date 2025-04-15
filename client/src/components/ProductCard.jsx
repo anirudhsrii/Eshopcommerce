@@ -14,7 +14,9 @@ const ProductCard = ({products}) => {
             </div>
             <div className="text-gray-500/60 text-sm">
                 <p>{products.category}</p>
-                <p className="text-gray-700 font-medium text-lg truncate w-full">{products.name}</p>
+                <p className="text-gray-700 font-medium text-lg truncate w-full">
+                    {products ? products.name : "Product not found"}
+                </p>
                 <div className="flex items-center gap-0.5">
                     {Array(5).fill('').map((_, i) => (
                             <img key={i} src={i<4 ? assets.star_icon : assets.star_dull_icon} 

@@ -1,48 +1,48 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const addressSchema = new mongoose.Schema({
-    userId:{
+    userId: {
         type: String,
-        required: true,
+        required: [true, 'User ID is required'],
     },
-    firstName:{
+    firstName: {
         type: String,
-        required: true,
+        required: [true, 'First name is required'],
     },
-    lastName:{
+    lastName: {
         type: String,
-        required: true,
+        required: [true, 'Last name is required'],
     },
-    email:{
+    email: {
         type: String,
-        required: true,
+        required: [true, 'Email is required'],
     },
-    street:{
+    street: {
         type: String,
-        required: true,
+        required: [true, 'Street is required'],
     },
-    city:{
+    city: {
         type: String,
-        required: true,
+        required: [true, 'City is required'],
     },
-    state:{
+    state: {
         type: String,
-        required: true,
-    },zipcode:{
+        required: [true, 'State is required'],
+    },
+    zipcode: {
         type: Number,
-        required: true,
+        required: [true, 'Zipcode is required'],
     },
-    country:{
+    country: {
         type: String,
-        required: true,
+        required: [true, 'Country is required'],
     },
-    phone:{
+    phone: {
         type: String,
-        required: true,
+        required: [true, 'Phone number is required'],
     },
-    
-})
+});
 
-const Address = mongoose.model.address||mongoose.model('address', addressSchema)
+const Address = mongoose.models.address || mongoose.model('address', addressSchema);
 
-export default Address
+export default Address;
