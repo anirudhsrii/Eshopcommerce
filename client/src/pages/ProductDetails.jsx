@@ -50,7 +50,9 @@ const ProductDetails = () => {
                 </div>
 
                 <div className="text-sm w-full md:w-1/2">
-                    <h1 className="text-3xl font-medium">{product.name}</h1>
+                    <h1 className="text-3xl font-medium">
+                        {product ? product.name : "Product not found"}
+                    </h1>
 
                     <div className="flex items-center gap-0.5 mt-1">
                         {Array(5).fill('').map((_, i) => (

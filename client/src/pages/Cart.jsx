@@ -1,33 +1,102 @@
 import { useEffect, useState } from "react"
 import { useAppContext } from "../context/AppContext"
 import { assets, dummyAddress } from "../assets/assets"
+import toast from "react-hot-toast"
+
+
 const Cart = () => {
     const [showAddress, setShowAddress] = useState(false)
-    const {products, currency, cartItems, removeFromCart, getCartCount, updateCartItem,navigate,getCartAmount} = useAppContext()
+    const {products, currency, cartItems, removeFromCart, getCartCount, updateCartItem,navigate,getCartAmount, axios, user, setCartItems} = useAppContext()
     const[cartArray, setCartArray] = useState([])
-    const [address, setAddress] = useState(dummyAddress)
-    const [ selectedAddress, setSelectedAddress] = useState(dummyAddress[0])
+    const [address, setAddress] = useState([])
+    const [ selectedAddress, setSelectedAddress] = useState(null)
     const [paymentOption,setPaymentOption] = useState("COD")
     
-    const getCart = ()=>{
-        let tempArray = []
-        for(const key in cartItems){
-            const product = products.find((item) => item._id === key)
-            product.quantity = cartItems[key]
-            tempArray.push(product)
+    const getCart = () => {
+        let tempArray = [];
+        for (const key in cartItems) {
+            const product = products.find((item) => item._id === key);
+            if (product) { // Ensure `product` exists
+                product.quantity = cartItems[key];
+                tempArray.push(product);
+            }
         }
-        setCartArray(tempArray)
+        setCartArray(tempArray);
+    };
+
+    const getUserAddress = async () => {
+        try{
+            const {data} = await axios.get('/api/address/get');
+            if(data.success){
+                setAddress(data.addresses)
+                if(data.addresses.length > 0){
+                    setSelectedAddress(data.addresses[0])
+                } else{
+                    toast.error(data.message)
+                }
+            }
+
+        } catch(error) {
+            toast.error(error.message)
+
+        }
+
     }
 
     const placeOrder = async () => {
+        try {
+            if (!user || !user._id) {
+                toast.error("User is not logged in");
+                return;
+            }
+            if (!cartArray || cartArray.length === 0) {
+                toast.error("Cart is empty");
+                return;
+            }
+            if (!selectedAddress || !selectedAddress._id) {
+                toast.error("Please select an address");
+                return;
+            }
 
-    }
+            const payload = {
+                userId: user._id,
+                items: cartArray.map((item) => ({ product: item._id, quantity: item.quantity })),
+                address: selectedAddress._id,
+            };
+
+            const { data } = await axios.post(
+                paymentOption === "COD" ? "/api/order/cod" : "/api/order/stripe",
+                payload
+            );
+
+            if (data.success) {
+                if (paymentOption === "COD") {
+                    toast.success("Order placed successfully!");
+                    setCartItems({});
+                    navigate("/my-orders");
+                } else {
+                    window.location.replace(data.url); // Redirect to Stripe payment
+                }
+            } else {
+                toast.error(data.message || "Failed to place order");
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message || "Something went wrong!");
+        }
+    };
 
     useEffect(()=>{
         if(products.length > 0 && cartItems){
             getCart()
         }
     },[products,cartItems])
+
+    useEffect(()=>{
+        if(user){
+           getUserAddress() 
+        }
+
+    },[user])
 
     return products.length > 0 && cartItems ? (
         <div className="flex flex-col md:flex-row mt-16">
@@ -96,9 +165,15 @@ const Cart = () => {
                         {showAddress && (
                             <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
                                 {address.map((address,index)=>(
-                                     <p onClick={() => {selectedAddress(address);setShowAddress(false)}} className="text-gray-500 p-2 hover:bg-gray-100">
-                                    {address.street}, {address.city},{address.state},{address.country}
-                                </p>
+                                     <p
+                                        onClick={() => {
+                                            setSelectedAddress(address);
+                                            setShowAddress(false);
+                                        }}
+                                        className="text-gray-500 p-2 hover:bg-gray-100"
+                                    >
+                                        {address.street}, {address.city}, {address.state}, {address.country}
+                                    </p>
                                 ))}
                                 <p onClick={() => navigate("/add-address")} className="text-primary text-center cursor-pointer p-2 hover:bg-primary/10">
                                     Add address

@@ -1,49 +1,46 @@
 import mongoose from "mongoose";
 
-
 const orderSchema = new mongoose.Schema({
-    userId:{
-        type: String,
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
-        ref: 'user'
     },
-    items:[{
-        product:{
-            type: String,
-            required: true,
-            ref: 'product'
+    items: [
+        {
+            product: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
+                required: [true, "Product is required"], // Ensure `product` is required
+            },
+            quantity: {
+                type: Number,
+                required: [true, "Quantity is required"],
+                min: [1, "Quantity must be at least 1"],
+            },
         },
-        quantity:{
-            type: Number,
-            required: true,
-        }
-    }],
-    amount:{
-        type: Number,
-        required: true,
+    ],
+    address: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Address",
+        required: [true, "Address is required"],
     },
-    address:{
+    amount: {
+        type: Number,
+        required: [true, "Amount is required"],
+    },
+    paymentType: {
         type: String,
-        required: true,
-        ref: 'address'
+        enum: ["COD", "Online"],
+        required: [true, "Payment type is required"],
     },
     status: {
         type: String,
-        default: 'Order Placed'
+        enum: ["Pending", "Completed", "Cancelled"],
+        default: "Pending",
     },
-    paymentType:{
-        type: String,
-        required: true,
-    },
-    isPaid:{
-        type: Boolean,
-        required: true,
-        default: false,
-    },
+}, { timestamps: true });
 
-},{
-    timestamps: true,
-})
+const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
 
-const Order = mongoose.model.order || mongoose.model('order', orderSchema)
-export default Order
+export default Order;

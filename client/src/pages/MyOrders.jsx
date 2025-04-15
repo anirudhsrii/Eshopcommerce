@@ -5,14 +5,23 @@ import { dummyAddress, dummyOrders } from '../assets/assets';
 const MyOrders = () => {
     
     const[MyOrders, setMyOrders] = useState([]);
-    const{currency} = useAppContext()
+    const{currency,axios,user} = useAppContext()
     
     const fetchMyOrders = async () => {
-        setMyOrders(dummyOrders)
+        try{
+            const {data} = await axios.get('/api/order/user')
+            if(data.success){
+                setMyOrders(data.orders)
+            }
+        }  catch (error){
+            console.log(error)
+        }
     }
     useEffect(()=>{
-        fetchMyOrders()
-    },[])
+        if(user) {
+            fetchMyOrders()
+        }
+    },[user])
   return (
     <div className='mt-16 pb-16'>
       <div className='mb-8 flex flex-col items-end w-max'>
@@ -35,7 +44,9 @@ const MyOrders = () => {
                            <img src={item.product.image[0]} alt='' className='w-16 h-16'/>
                         </div>
                         <div className='ml-4'>
-                            <h2 className='text-xl font-medium text-gray-800'> {item.product.name} </h2>
+                            <h2 className="text-xl font-medium text-gray-800">
+                                {item.product ? item.product.name : "Product not found"}
+                            </h2>
                             <p> Category: {item.product.category}</p>
                         </div>
                     </div>
