@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+axios.defaults.withCredentials = true; // Ensure cookies are sent with requests
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL; // Backend URL
 
 export const AppContext = createContext();
 
@@ -96,30 +96,6 @@ const AppContextProvider = ({ children }) => {
         fetchSeller();
         fetchProducts();
     }, []);
-
-    useEffect(() => {
-        const updateCart = async () => {
-            try {
-                // Ensure user._id and cartItems are valid before making the API call
-                if (!user || !user._id || Object.keys(cartItems).length === 0) {
-                    return; // Skip if user or cartItems are invalid
-                }
-
-                const { data } = await axios.post("/api/user/update", {
-                    userId: user._id,
-                    cartItems,
-                });
-
-                if (!data.success) {
-                    toast.error(data.message);
-                }
-            } catch (error) {
-                toast.error(error.message);
-            }
-        };
-
-        updateCart();
-    }, [cartItems, user]);
 
     const value = {
         navigate,
