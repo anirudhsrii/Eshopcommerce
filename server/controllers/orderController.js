@@ -1,5 +1,6 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import Address from '../models/Address.js'; // Import the Address model
 import Stripe from 'stripe';
 
 // Place order COD : /api/order/cod
@@ -112,23 +113,22 @@ export const placeOrderStripe = async (req, res) => {
 // Get Order by User ID : /api/order/user
 export const getUserOrders = async (req, res) => {
     try {
-        const { userId } = req.user;
+        const { userId } = req.user; // Ensure `authUser` middleware sets `req.user`
 
         if (!userId) {
             return res.status(400).json({ success: false, message: "User ID is required" });
         }
 
-        const orders = await Order.find({
-            userId,
-            $or: [{ paymentType: "COD" }, { isPaid: true }],
-        })
-            .populate("items.product address")
-            .sort({ createdAt: -1 });
+        // Fetch orders and populate product and address fields
+        const orders = await Order.find({ userId })
+            .populate('items.product') // Populate product details
+            .populate('address') // Populate address details
+            .sort({ createdAt: -1 }); // Sort by most recent orders
 
         res.json({ success: true, orders });
     } catch (error) {
-        console.error("Error in getUserOrders:", error.message);
-        res.status(500).json({ success: false, message: error.message });
+        console.error("Error in getUserOrders:", error.message); // Debugging log
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
 
